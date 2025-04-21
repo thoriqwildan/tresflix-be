@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Roles {
+  user
+  admin
+}
+
+enum Status {
+  active
+  inactive
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique @db.VarChar(50)
+  name          String?   @db.VarChar(50)
+  role          Roles     @default(user)
+  status        Status    @default(active)
+  password      String    @db.VarChar(255)
+  refresh_token String?   @db.VarChar(255)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime? @db.Timestamp(6)
+
+  ratings   Rating[]
+  watchlist Watchlist[]
+}
+
+model Movie {
+  id           Int       @id @default(autoincrement())
+  title        String    @db.VarChar(100)
+  release_year Int
+  duration     String    @db.VarChar(50)
+  description  String    @db.Text
+  poster_url   String    @db.VarChar(255)
+  trailer_url  String    @db.VarChar(255)
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime? @db.Timestamp(6)
+
+  genres    MovieGenres[]
+  images    MovieImage[]
+  actors    MovieActors[]
+  ratings   Rating[]
+  watchlist Watchlist[]
+}
+
+model MovieGenres {
+  movie_id Int
+  movie    Movie @relation(fields: [movie_id], references: [id])
+  genre_id Int
+  genre    Genre @relation(fields: [genre_id], references: [id])
+
+  @@id([movie_id, genre_id])
+}
+
+model Genre {
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar(50)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime? @db.Timestamp(6)
+
+  movies MovieGenres[]
+}
+
+model MovieImage {
+  movie_id   Int      @id
+  movie      Movie    @relation(fields: [movie_id], references: [id])
+  image_url  String   @db.VarChar(255)
+  created_at DateTime @default(now())
+}
+
+model MovieActors {
+  movie_id Int
+  movie    Movie @relation(fields: [movie_id], references: [id])
+  actor_id Int
+  actor    Actor @relation(fields: [actor_id], references: [id])
+
+  @@id([movie_id, actor_id])
+}
+
+model Actor {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(50)
+  birth_date  DateTime?
+  biography   String?   @db.Text
+  profile_url String?   @db.VarChar(255)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  deleted_at  DateTime? @db.Timestamp(6)
+
+  movies MovieActors[]
+}
+
+model Rating {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  user       User      @relation(fields: [user_id], references: [id])
+  movie_id   Int
+  movie      Movie     @relation(fields: [movie_id], references: [id])
+  rating     Int
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime? @db.Timestamp(6)
+}
+
+model Watchlist {
+  user_id    Int
+  user       User      @relation(fields: [user_id], references: [id])
+  movie_id   Int
+  movie      Movie     @relation(fields: [movie_id], references: [id])
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime? @db.Timestamp(6)
+
+  @@id([user_id, movie_id])
+}
