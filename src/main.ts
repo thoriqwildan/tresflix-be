@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,6 +23,8 @@ async function bootstrap() {
   app.use('/docs', apiReference({ spec: { content: document } }));
 
   app.useGlobalPipes(new ValidationPipe());
+
+  app.use(cookieParser());
 
   await app.listen(configService.get('port')!);
   console.log(`Application is running on: ${await app.getUrl()}`);

@@ -1,14 +1,9 @@
-import {
-  BadRequestException,
-  HttpStatus,
-  Injectable,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { LoginDto } from './dto/login.dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcryptjs'
+import * as bcrypt from 'bcryptjs';
 import { AuthSignUpDto } from './dto/auth-signup.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 
@@ -22,40 +17,47 @@ export class AuthService {
 
   async signUp(signupDto: AuthSignUpDto): Promise<LoginResponseDto> {
     const email = await this.prismaService.user.count({
-      where: { email: signupDto.email }
-    })
+      where: { email: signupDto.email },
+    });
     if (email > 0) {
-      throw new BadRequestException('Email already Exist!')
+      throw new BadRequestException('Email already Exist!');
     }
-    signupDto.password = await bcrypt.hash(signupDto.password, 10)
+    signupDto.password = await bcrypt.hash(signupDto.password, 10);
 
     const data = await this.prismaService.user.create({
       data: {
         email: signupDto.email,
         name: signupDto.name,
         password: signupDto.password,
-      }
-    })
+      },
+    });
 
-    const payload = { sub: data.id, email: data.email, role: data.role }
-    return await this.generateToken(payload)
+    const payload = { sub: data.id, email: data.email, role: data.role };
+    return await this.generateToken(payload);
   }
 
-  async signIn(loginDto: LoginDto) {
+  async signIn(loginDto: LoginDto): Promise<LoginResponseDto> {
     const data = await this.prismaService.user.findUnique({
-      where: { email: loginDto.email }
-    })
+      where: { email: loginDto.email },
+    });
     if (!data) {
-      throw new BadRequestException('Invalid Email or Password!')
+      throw new BadRequestException('Invalid Email or Password!');
     }
 
-    const passwordCheck = await bcrypt.compare(loginDto.password, data.password)
-    if (!passwordCheck) { throw new BadRequestException('Invalid Password') }
+    const passwordCheck = await bcrypt.compare(
+      loginDto.password,
+      data.password,
+    );
+    if (!passwordCheck) {
+      throw new BadRequestException('Invalid Password');
+    }
 
-    const payload = { sub: data.id, email: data.email, role: data.role }
-    const tokens = await this.generateToken(payload)
-    if ( loginDto.remember_me == false ) { return tokens.token }
-    return tokens
+    const payload = { sub: data.id, email: data.email, role: data.role };
+    const tokens = await this.generateToken(payload);
+    if (loginDto.remember_me == false) {
+      return { token: tokens.token };
+    }
+    return tokens;
   }
 
   async refresh(user_id: number) {
