@@ -5,7 +5,7 @@ import { PaginationResponseDto } from 'src/utils/dto/pagination-response.dto';
 import { PaginationDto } from 'src/utils/dto/pagination.dto';
 
 @Injectable()
-export class GenreRepositories {
+export class ActorRepositories {
   constructor(private prismaService: PrismaService) {}
 
   async findManyWithPagination(
@@ -15,17 +15,20 @@ export class GenreRepositories {
     const skip = (page! - 1) * limit!;
 
     const [data, total] = await Promise.all([
-      this.prismaService.genre.findMany({
+      this.prismaService.actor.findMany({
         skip,
         take: Number(limit),
         orderBy: { id: 'asc' },
         select: {
           id: true,
           name: true,
+          biography: true,
+          birth_date: true,
+          profile_url: true,
           created_at: true,
         },
       }),
-      this.prismaService.genre.count(),
+      this.prismaService.actor.count(),
     ]);
 
     return {

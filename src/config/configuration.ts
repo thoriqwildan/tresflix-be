@@ -4,4 +4,5 @@ export default () => ({
     access: process.env.ACCESS_SECRET || 'AccessSecret',
     refresh: process.env.REFRESH_SECRET || 'RefreshSecret',
   },
+  folders: process.env.FOLDERS || './uploads',
 });

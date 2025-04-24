@@ -32,7 +32,7 @@ export class GenreService {
 
   async findOne(id: number) {
     const data = await this.prismaService.genre.findFirst({
-      where: { id, deleted_at: null },
+      where: { id },
       select: { id: true, name: true, created_at: true },
     });
     if (!data) {
@@ -43,15 +43,37 @@ export class GenreService {
 
   async update(id: number, updateGenreDto: UpdateGenreDto) {
     const checkGenre = await this.prismaService.genre.findFirst({
-      where: { id: id, deleted_at: null },
+      where: { id: id },
       select: { id: true, name: true, created_at: true },
     });
     if (!checkGenre) {
       throw new BadRequestException('Genre not found');
     }
+    const checkGenreName = await this.prismaService.genre.findUnique({
+      where: { name: updateGenreDto.genre },
+    });
+    if (checkGenreName) {
+      throw new BadRequestException('Genre already exists');
+    }
+    const data = await this.prismaService.genre.update({
+      where: { id: id },
+      data: { name: updateGenreDto.genre },
+      select: { id: true, name: true, created_at: true },
+    });
+    return data;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} genre`;
+  async remove(id: number) {
+    const checkGenre = await this.prismaService.genre.findFirst({
+      where: { id: id },
+    });
+    if (!checkGenre) {
+      throw new BadRequestException('Genre not found');
+    }
+    await this.prismaService.genre.delete({
+      where: { id: id },
+    });
+
+    return `Genre Deleted!`;
   }
 }

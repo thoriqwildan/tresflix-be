@@ -6,6 +6,7 @@ import { apiReference } from '@scalar/nestjs-api-reference';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
+import * as express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,6 +22,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
 
   app.use('/docs', apiReference({ spec: { content: document } }));
+  app.use('/actors', express.static(`${configService.get('folders')}/actors`));
 
   app.useGlobalPipes(new ValidationPipe());
 

@@ -14,10 +14,11 @@ import { GenreService } from './genre.service';
 import { CreateGenreDto } from './dto/create-genre.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
 import { JwtRoleGuard } from 'src/auth/guards/jwtrole.guard';
-import { ApiCookieAuth } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
 import { PaginationDto } from 'src/utils/dto/pagination.dto';
 
-@Controller('genre')
+@Controller('genres')
+@ApiTags('Genres')
 export class GenreController {
   constructor(private readonly genreService: GenreService) {}
 
@@ -45,12 +46,16 @@ export class GenreController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtRoleGuard)
+  @ApiCookieAuth()
   update(@Param('id') id: string, @Body() updateGenreDto: UpdateGenreDto) {
     return this.genreService.update(+id, updateGenreDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.genreService.remove(+id);
+  @UseGuards(JwtRoleGuard)
+  @ApiCookieAuth()
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.genreService.remove(id);
   }
 }

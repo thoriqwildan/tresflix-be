@@ -73,7 +73,6 @@ model Genre {
   name       String    @db.VarChar(50) @unique
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
-  deleted_at DateTime? @db.Timestamp(6)
 
   movies MovieGenres[]
 }
