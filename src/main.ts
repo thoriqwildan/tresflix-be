@@ -19,6 +19,8 @@ async function bootstrap() {
     .addCookieAuth()
     .build();
 
+  app.enableCors('*')
+
   const document = SwaggerModule.createDocument(app, config);
 
   app.use('/docs', apiReference({ spec: { content: document } }));

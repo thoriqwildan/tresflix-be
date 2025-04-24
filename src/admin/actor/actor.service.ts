@@ -39,6 +39,14 @@ export class ActorService {
   async findOne(id: number) {
     const data = await this.prismaService.actor.findFirst({
       where: { id },
+      select: { 
+        id: true,
+        name: true,
+        biography: true,
+        birth_date: true,
+        profile_url: true,
+        created_at: true
+       }
     });
     if (!data) {
       throw new BadRequestException('Actor not found');
@@ -73,7 +81,13 @@ export class ActorService {
     return data;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} actor`;
+  async remove(id: number) {
+    const data = await this.prismaService.actor.delete({
+      where: { id: id }
+    })
+    if (!data) {
+      throw new BadRequestException('Data not Found')
+    }
+    return data
   }
 }

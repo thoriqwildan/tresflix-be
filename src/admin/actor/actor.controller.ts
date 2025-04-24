@@ -234,7 +234,10 @@ export class ActorController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.actorService.remove(+id);
+  @UseGuards(JwtRoleGuard)
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.actorService.remove(id)
+    await fs.remove(`${this.configService.get('folders')}${data.profile_url}`)
+    return 'Data Successfully Deleted'
   }
 }
