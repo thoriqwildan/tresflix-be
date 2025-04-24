@@ -46,8 +46,31 @@ export class ActorService {
     return data;
   }
 
-  update(id: number, updateActorDto: UpdateActorDto) {
-    return `This action updates a #${id} actor`;
+  async update(id: number, updateActorDto: UpdateActorDto) {
+    const checkActor = await this.prismaService.actor.count({
+      where: { id },
+    });
+    if (!checkActor) {
+      throw new BadRequestException('Actor Not Found!');
+    }
+    const birthDate = new Date(updateActorDto.birthDate!);
+    const data = await this.prismaService.actor.update({
+      where: { id: id },
+      data: {
+        name: updateActorDto.name,
+        biography: updateActorDto.biography,
+        birth_date: birthDate,
+        profile_url: updateActorDto.file,
+      },
+      select: {
+        id: true,
+        name: true,
+        biography: true,
+        birth_date: true,
+        profile_url: true,
+      },
+    });
+    return data;
   }
 
   remove(id: number) {
