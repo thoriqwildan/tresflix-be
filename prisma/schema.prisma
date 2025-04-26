@@ -104,13 +104,11 @@ model Rating {
 }
 
 model Watchlist {
+  id         Int       @id @default(autoincrement())
   user_id    Int
   user       User      @relation(fields: [user_id], references: [id])
   movie_id   Int
   movie      Movie     @relation(fields: [movie_id], references: [id])
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
-  deleted_at DateTime? @db.Timestamp(6)
-
-  @@id([user_id, movie_id])
 }
