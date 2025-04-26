@@ -47,26 +47,19 @@ model Movie {
   duration     String    @db.VarChar(50)
   description  String    @db.Text
   poster_url   String    @db.VarChar(255)
-  trailer_url  String    @db.VarChar(255)
+  trailer_url  String?    @db.VarChar(255)
   created_at   DateTime  @default(now())
   updated_at   DateTime  @updatedAt
   deleted_at   DateTime? @db.Timestamp(6)
 
-  genres    MovieGenres[]
+  genres    Genre[] @relation("MovieGenres")
   images    MovieImage[]
-  actors    MovieActors[]
+  actors    Actor[] @relation("MovieActors")
   ratings   Rating[]
   watchlist Watchlist[]
 }
 
-model MovieGenres {
-  movie_id Int
-  movie    Movie @relation(fields: [movie_id], references: [id])
-  genre_id Int
-  genre    Genre @relation(fields: [genre_id], references: [id])
 
-  @@id([movie_id, genre_id])
-}
 
 model Genre {
   id         Int       @id @default(autoincrement())
@@ -74,7 +67,7 @@ model Genre {
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
 
-  movies MovieGenres[]
+  movies Movie[] @relation("MovieGenres")
 }
 
 model MovieImage {
@@ -84,14 +77,6 @@ model MovieImage {
   created_at DateTime @default(now())
 }
 
-model MovieActors {
-  movie_id Int
-  movie    Movie @relation(fields: [movie_id], references: [id])
-  actor_id Int
-  actor    Actor @relation(fields: [actor_id], references: [id])
-
-  @@id([movie_id, actor_id])
-}
 
 model Actor {
   id          Int       @id @default(autoincrement())
@@ -103,7 +88,7 @@ model Actor {
   updated_at  DateTime  @updatedAt
   deleted_at  DateTime? @db.Timestamp(6)
 
-  movies MovieActors[]
+  movies Movie[] @relation("MovieActors")
 }
 
 model Rating {

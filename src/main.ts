@@ -19,12 +19,13 @@ async function bootstrap() {
     .addCookieAuth()
     .build();
 
-  app.enableCors('*')
+  app.enableCors('*');
 
   const document = SwaggerModule.createDocument(app, config);
 
   app.use('/docs', apiReference({ spec: { content: document } }));
   app.use('/actors', express.static(`${configService.get('folders')}/actors`));
+  app.use('/movies', express.static(`${configService.get('folders')}/movies`));
 
   app.useGlobalPipes(new ValidationPipe());
 
