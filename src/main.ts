@@ -19,7 +19,10 @@ async function bootstrap() {
     .addCookieAuth()
     .build();
 
-  app.enableCors('*');
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  });
 
   const document = SwaggerModule.createDocument(app, config);
 
