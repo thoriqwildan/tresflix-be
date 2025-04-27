@@ -130,6 +130,13 @@ export class ActorController {
 
   @Get()
   findAll(@Query() paginationDto: PaginationDto) {
+    if (!paginationDto.page) {
+      paginationDto.page = 1;
+    }
+    if (!paginationDto.limit) {
+      paginationDto.limit = 10;
+    }
+
     return this.actorService.findAll(paginationDto);
   }
 
