@@ -79,6 +79,23 @@ export class AuthService {
     });
   }
 
+  async getMe(user_id: number) {
+    const data = await this.prismaService.user.findFirst({
+      where: { id: user_id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        status: true,
+      },
+    });
+    if (!data) {
+      throw new BadRequestException('Invalid user');
+    }
+    return data;
+  }
+
   async generateToken(payload: {
     sub: number;
     email: string;

@@ -94,6 +94,13 @@ export class AuthController {
     return { message: 'Logged In' };
   }
 
+  @Get('me')
+  @UseGuards(JwtRoleGuard)
+  @ApiCookieAuth()
+  async getMe(@Req() req: Request) {
+    return await this.authService.getMe(req.user!['sub']);
+  }
+
   @Delete('signout')
   @UseGuards(JwtRoleGuard)
   @ApiCookieAuth()
