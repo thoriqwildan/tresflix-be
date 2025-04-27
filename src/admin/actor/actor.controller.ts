@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Controller,
@@ -183,8 +178,11 @@ export class ActorController {
     @Body(new ValidationPipe({ transform: true }))
     updateActorDto: UpdateActorDto,
   ) {
+    const data = await this.actorService.update(id, updateActorDto);
+    let fileLink = data.profile_url;
+
     if (cover) {
-      const title = updateActorDto.name!.replace(/\s+/g, '-').toLowerCase();
+      const title = data.name.replace(/\s+/g, '-').toLowerCase();
       const date = new Date().toISOString().split('T')[0];
       const extension: string = path.extname(cover.originalname);
       const filename = `${title}-${date}${extension}`;
@@ -231,10 +229,10 @@ export class ActorController {
         console.error('Failed to delete temp file:', err);
       }
 
-      updateActorDto.file = `/actors/${filename}`;
+      fileLink = `/actors/${filename}`;
     }
 
-    return await this.actorService.update(id, updateActorDto);
+    return await this.actorService.updateLinkFile(id, fileLink!);
   }
 
   @Delete(':id')

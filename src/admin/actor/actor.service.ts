@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateActorDto } from './dto/create-actor.dto';
 import { UpdateActorDto } from './dto/update-actor.dto';
@@ -61,15 +63,29 @@ export class ActorService {
     if (!checkActor) {
       throw new BadRequestException('Actor Not Found!');
     }
-    const birthDate = new Date(updateActorDto.birthDate!);
+
+    // Persiapkan data update secara dinamis
+    const updateData: any = {};
+
+    if (updateActorDto.name !== undefined) {
+      updateData.name = updateActorDto.name;
+    }
+
+    if (updateActorDto.biography !== undefined) {
+      updateData.biography = updateActorDto.biography;
+    }
+
+    if (updateActorDto.birthDate !== undefined) {
+      updateData.birth_date = new Date(updateActorDto.birthDate);
+    }
+
+    if (updateActorDto.file !== undefined) {
+      updateData.profile_url = updateActorDto.file;
+    }
+
     const data = await this.prismaService.actor.update({
-      where: { id: id },
-      data: {
-        name: updateActorDto.name,
-        biography: updateActorDto.biography,
-        birth_date: birthDate,
-        profile_url: updateActorDto.file,
-      },
+      where: { id },
+      data: updateData,
       select: {
         id: true,
         name: true,
@@ -78,7 +94,15 @@ export class ActorService {
         profile_url: true,
       },
     });
+
     return data;
+  }
+
+  async updateLinkFile(id: number, file: string) {
+    return await this.prismaService.actor.update({
+      where: { id },
+      data: { profile_url: file },
+    });
   }
 
   async remove(id: number) {
