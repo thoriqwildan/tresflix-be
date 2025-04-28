@@ -55,7 +55,7 @@ export class AuthService {
     const payload = { sub: data.id, email: data.email, role: data.role };
     const tokens = await this.generateToken(payload);
     if (loginDto.remember_me == false) {
-      return { token: tokens.token };
+      return { access_token: tokens.access_token };
     }
     return tokens;
   }
@@ -101,19 +101,19 @@ export class AuthService {
     email: string;
     role: string;
   }): Promise<LoginResponseDto> {
-    const token = this.jwtService.sign(payload, {
+    const access_token = this.jwtService.sign(payload, {
       secret: this.configService.get('secret.access'),
       expiresIn: '30m',
     });
-    const refreshToken = this.jwtService.sign(payload, {
+    const refresh_token = this.jwtService.sign(payload, {
       secret: this.configService.get('secret.refresh'),
       expiresIn: '7d',
     });
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    const hashedRefreshToken = await bcrypt.hash(refresh_token, 10);
     await this.prismaService.user.update({
       where: { id: payload.sub },
       data: { refresh_token: hashedRefreshToken },
     });
-    return { token, refreshToken };
+    return { access_token, refresh_token };
   }
 }

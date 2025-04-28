@@ -5,7 +5,7 @@ import { WatchlistService } from './watchlist.service';
 import { CreateWatchListDto } from './create.dto';
 import { Request } from 'express';
 import { JwtRoleGuard } from 'src/auth/guards/jwtrole.guard';
-import { ApiCookieAuth } from '@nestjs/swagger';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('watchlist')
 export class WatchlistController {
@@ -13,7 +13,7 @@ export class WatchlistController {
 
   @Post()
   @UseGuards(JwtRoleGuard)
-  @ApiCookieAuth()
+  @ApiBearerAuth()
   async create(@Req() req: Request, @Body() watchlist: CreateWatchListDto) {
     const userId = req.user!['sub'];
     return await this.watchlistService.createWatchlist(userId, watchlist);

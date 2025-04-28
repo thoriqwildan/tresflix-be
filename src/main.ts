@@ -17,6 +17,7 @@ async function bootstrap() {
     .setDescription('The TresFlix API description')
     .setVersion('1.0')
     .addCookieAuth()
+    .addBearerAuth()
     .build();
 
   app.enableCors({

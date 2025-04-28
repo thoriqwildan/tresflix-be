@@ -20,7 +20,7 @@ import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { JwtRoleGuard } from 'src/auth/guards/jwtrole.guard';
-import { ApiConsumes, ApiCookieAuth } from '@nestjs/swagger';
+import { ApiConsumes, ApiBearerAuth } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
@@ -38,7 +38,7 @@ export class MovieController {
 
   @Post()
   @UseGuards(JwtRoleGuard)
-  @ApiCookieAuth()
+  @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('poster', {
@@ -153,7 +153,7 @@ export class MovieController {
 
   @Patch(':id')
   @UseGuards(JwtRoleGuard)
-  @ApiCookieAuth()
+  @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('poster', {
@@ -247,7 +247,7 @@ export class MovieController {
 
   @Delete(':id')
   @UseGuards(JwtRoleGuard)
-  @ApiCookieAuth()
+  @ApiBearerAuth()
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.movieService.remove(id);
   }

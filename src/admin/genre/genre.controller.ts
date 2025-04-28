@@ -14,7 +14,7 @@ import { GenreService } from './genre.service';
 import { CreateGenreDto } from './dto/create-genre.dto';
 import { UpdateGenreDto } from './dto/update-genre.dto';
 import { JwtRoleGuard } from 'src/auth/guards/jwtrole.guard';
-import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PaginationDto } from 'src/utils/dto/pagination.dto';
 
 @Controller('genres')
@@ -24,7 +24,7 @@ export class GenreController {
 
   @Post()
   @UseGuards(JwtRoleGuard)
-  @ApiCookieAuth()
+  @ApiBearerAuth()
   create(@Body() createGenreDto: CreateGenreDto) {
     return this.genreService.create(createGenreDto);
   }
@@ -47,14 +47,14 @@ export class GenreController {
 
   @Patch(':id')
   @UseGuards(JwtRoleGuard)
-  @ApiCookieAuth()
+  @ApiBearerAuth()
   update(@Param('id') id: string, @Body() updateGenreDto: UpdateGenreDto) {
     return this.genreService.update(+id, updateGenreDto);
   }
 
   @Delete(':id')
   @UseGuards(JwtRoleGuard)
-  @ApiCookieAuth()
+  @ApiBearerAuth()
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.genreService.remove(id);
   }

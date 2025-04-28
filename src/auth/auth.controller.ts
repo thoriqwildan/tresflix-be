@@ -5,6 +5,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Post,
   Req,
   Res,
@@ -25,39 +26,19 @@ export class AuthController {
   @Post('signup')
   async SignUp(
     @Body() signupDto: AuthSignUpDto,
-    @Res({ passthrough: true }) res: Response,
   ) {
     const tokens = await this.authService.signUp(signupDto);
 
-    res.cookie('access_token', tokens.token, {
-      httpOnly: true,
-      maxAge: 30 * 60 * 1000,
-    });
-
-    res.cookie('refresh_token', tokens.refreshToken, {
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    });
-    return { message: 'Logged In' };
+    return tokens;
   }
 
   @Post('signin')
   async SignIn(
     @Body() signInDto: LoginDto,
-    @Res({ passthrough: true }) res: Response,
   ) {
     const tokens = await this.authService.signIn(signInDto);
 
-    res.cookie('access_token', tokens.token, {
-      httpOnly: true,
-      maxAge: 30 * 60 * 1000,
-    });
-
-    res.cookie('refresh_token', tokens.refreshToken, {
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    });
-    return { message: 'Logged In' };
+    return tokens;
   }
 
   @Get('test')
@@ -72,26 +53,13 @@ export class AuthController {
   @ApiCookieAuth()
   async refreshToken(
     @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
   ) {
     const tokens = await this.authService.refresh(req.user!['sub']);
     console.log(req.user!['sub']);
     if (!tokens) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      throw new NotFoundException('Token not found');
     }
-    req.res?.clearCookie('access_token');
-    req.res?.clearCookie('refresh_token');
-
-    res.cookie('access_token', tokens.token, {
-      httpOnly: true,
-      maxAge: 30 * 60 * 1000,
-    });
-
-    res.cookie('refresh_token', tokens.refreshToken, {
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    });
-    return { message: 'Logged In' };
+    return tokens;
   }
 
   @Get('me')
@@ -105,9 +73,7 @@ export class AuthController {
   @UseGuards(JwtRoleGuard)
   @ApiCookieAuth()
   async logout(@Req() req: Request) {
-    req.res?.clearCookie('access_token');
-    req.res?.clearCookie('refresh_token');
     await this.authService.signOut(req.user!['sub']);
-    return { message: 'Logged Out' };
+    return { message: 'Logout success' };
   }
 }

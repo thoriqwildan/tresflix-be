@@ -5,7 +5,7 @@ import { RateService } from './rate.service';
 import { Request } from 'express';
 import { CreateRateDto } from './dto/create.dto';
 import { JwtRoleGuard } from 'src/auth/guards/jwtrole.guard';
-import { ApiCookieAuth } from '@nestjs/swagger';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('rate')
 export class RateController {
@@ -13,7 +13,7 @@ export class RateController {
 
   @Post()
   @UseGuards(JwtRoleGuard)
-  @ApiCookieAuth()
+  @ApiBearerAuth()
   async create(@Req() req: Request, @Body() rate: CreateRateDto) {
     const userId = req.user!['sub'];
     return await this.rateService.createRate(userId, rate);

@@ -20,7 +20,7 @@ import { ActorService } from './actor.service';
 import { CreateActorDto } from './dto/create-actor.dto';
 import { UpdateActorDto } from './dto/update-actor.dto';
 import { JwtRoleGuard } from 'src/auth/guards/jwtrole.guard';
-import { ApiBody, ApiConsumes, ApiCookieAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ConfigService } from '@nestjs/config';
@@ -29,7 +29,7 @@ import * as fs from 'fs-extra';
 import * as sharp from 'sharp';
 import { PaginationDto } from 'src/utils/dto/pagination.dto';
 
-@ApiCookieAuth()
+@ApiBearerAuth()
 @Controller('actors')
 export class ActorController {
   constructor(
