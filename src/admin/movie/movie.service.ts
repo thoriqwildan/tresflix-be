@@ -80,6 +80,21 @@ export class MovieService {
   async findOne(id: number) {
     const checkMovie = await this.prismaService.movie.findFirst({
       where: { id, deleted_at: null },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        duration: true,
+        release_year: true,
+        trailer_url: true,
+        poster_url: true,
+        actors: {
+          select: { id: true, name: true },
+        },
+        genres: {
+          select: { id: true, name: true },
+        },
+      }
     });
     if (!checkMovie) {
       throw new BadRequestException('Movie not found');
